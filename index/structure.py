@@ -2,7 +2,7 @@ from IPython.display import clear_output
 from typing import List, Set, Union
 from abc import abstractmethod
 from functools import total_ordering
-from os import path
+from os import path, write
 import os
 import pickle
 import gc
@@ -176,12 +176,27 @@ class FileIndex(Index):
         gc.disable()
         
         #ordena pelo term_id, doc_id
-        
-        
-        ### Abra um arquivo novo faça a ordenação externa: compar sempre a primeira posição
-        ### da lista com a primeira possição do arquivo usando os métodos next_from_list e next_from_file
-        ### para armazenar no novo indice ordenado
+        self.lst_occurrences_tmp.sort()
 
+        ### Abra um arquivo novo faça a ordenação externa: compar sempre a primeira posição
+        file = open('memoria_secundaria.bin', 'wb')
+        
+        ### da lista com a primeira possição do arquivo usando os métodos next_from_list e next_from_file
+        first_file = self.next_from_file(file)
+        first_list = self.next_from_list()
+        while first_file != None and first_list != None:
+            if first_list <= first_file:
+                priority = first_list
+                first_list = self.next_from_list()
+            else:
+                priority = first_file
+                first_file = self.next_from_file()
+            ### para armazenar no novo indice ordenado
+            file.write(priority)
+        
+        # limpar a lista e fechar o arquivo
+        self.lst_occurrences_tmp = []
+        file.close()
         gc.enable()
 
     def finish_indexing(self):
