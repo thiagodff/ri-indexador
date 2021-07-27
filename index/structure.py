@@ -65,9 +65,10 @@ class Index:
     def __repr__(self):
         return str(self)
 
+
 @total_ordering
 class TermOccurrence:
-    def __init__(self,doc_id:int,term_id:int, term_freq:int):
+    def __init__(self, doc_id:int,term_id:int, term_freq:int):
         self.doc_id = doc_id
         self.term_id = term_id
         self.term_freq = term_freq
@@ -76,13 +77,17 @@ class TermOccurrence:
         pass
 
     def __hash__(self):
-    	return hash((self.doc_id,self.term_id))
+    	return hash((self.doc_id, self.term_id))
 
-    def __eq__(self,other_occurrence:"TermOccurrence"):
-        return False
+    def __eq__(self, other_occurrence:"TermOccurrence"):
+        if other_occurrence == None:
+            return False
+        return self.term_id == other_occurrence.term_id and self.doc_id == other_occurrence.doc_id
 
-    def __lt__(self,other_occurrence:"TermOccurrence"):
-        return False
+    def __lt__(self, other_occurrence:"TermOccurrence"):
+        if other_occurrence == None:
+            return False
+        return self.term_id < other_occurrence.term_id if self.term_id != other_occurrence.term_id else self.doc_id < other_occurrence.doc_id
 
     def __str__(self):
         return f"(term_id:{self.term_id} doc: {self.doc_id} freq: {self.term_freq})"
