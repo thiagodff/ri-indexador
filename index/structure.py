@@ -77,6 +77,7 @@ class TermOccurrence:
 
     def __hash__(self):
     	return hash((self.doc_id,self.term_id))
+
     def __eq__(self,other_occurrence:"TermOccurrence"):
         return False
 
@@ -95,20 +96,17 @@ class HashIndex(Index):
     def get_term_id(self, term:str):
         return self.dic_index[term][0].term_id
 
-    def create_index_entry(self, termo_id:int) -> List:
-        return None
+    def create_index_entry(self, term_id:int) -> List:
+        return list() # não entendi a necessidade do term_id, caso for necessário no futuro a gente corrige
 
     def add_index_occur(self, entry_dic_index:List[TermOccurrence], doc_id:int, term_id:int, term_freq:int):
-        entry_dic_index.append(None)
+        entry_dic_index.append(TermOccurrence(doc_id, term_id, term_freq))
 
-    def get_occurrence_list(self,term: str)->List:
-        return []
+    def get_occurrence_list(self, term: str)->List:
+        return list() if term not in self.dic_index else self.dic_index[term]
 
     def document_count_with_term(self,term:str) -> int:
-        return 0
-
-
-
+        return len(self.get_occurrence_list(term))
 
 
 class TermFilePosition:
