@@ -25,7 +25,7 @@ class Index:
 
     @property
     def vocabulary(self) -> List:
-        return list(self.dic_index.values())
+        return list(self.dic_index)
 
     @property
     def document_count(self) -> int:
