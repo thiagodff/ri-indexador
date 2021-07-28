@@ -187,23 +187,23 @@ class FileIndex(Index):
         gc.disable()
         
         #ordena pelo term_id, doc_id
-        self.lst_occurrences_tmp.sort()
+        self.lst_occurrences_tmp.sort(key=lambda x: x.term_id)
 
         ### Abra um arquivo novo faça a ordenação externa: compar sempre a primeira posição
         file = open('memoria_secundaria.bin', 'wb')
+        new_file = open('memoria_secundaria_new.bin', 'wb')
         
         ### da lista com a primeira possição do arquivo usando os métodos next_from_list e next_from_file
-        first_file = self.next_from_file(file)
-        first_list = self.next_from_list()
-        while first_file != None and first_list != None:
-            if first_list <= first_file:
-                priority = first_list
-                first_list = self.next_from_list()
+        nextTermFromFile = self.next_from_file(file)
+        nextTermFromList = self.next_from_list()
+        while nextTermFromFile != None or nextTermFromList != None:
+            if nextTermFromList < nextTermFromFile:
+                new_file.write(nextTermFromList)
+                nextTermFromList = self.next_from_list()
             else:
-                priority = first_file
-                first_file = self.next_from_file()
+                new_file.write(nextTermFromFile)
+                nextTermFromFile = self.next_from_file()
             ### para armazenar no novo indice ordenado
-            file.write(priority)
         
         # limpar a lista e fechar o arquivo
         self.lst_occurrences_tmp = []
