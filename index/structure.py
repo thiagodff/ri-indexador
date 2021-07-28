@@ -86,12 +86,12 @@ class TermOccurrence:
         if other_occurrence is None:
             return False
         return self.term_id < other_occurrence.term_id if self.term_id != other_occurrence.term_id else self.doc_id < other_occurrence.doc_id
-
+    
     def __gt__(self, other_occurrence: "TermOccurrence"):
         if other_occurrence is None:
             return False
         return self.term_id > other_occurrence.term_id if self.term_id != other_occurrence.term_id else self.doc_id > other_occurrence.doc_id
-
+    
     def __str__(self):
         return f"(term_id:{self.term_id} doc: {self.doc_id} freq: {self.term_freq})"
 
@@ -140,7 +140,7 @@ class FileIndex(Index):
 
         self.lst_occurrences_tmp = []
         self.idx_file_counter = 0
-        self.str_idx_file_name = "occur_idx_file"
+        self.str_idx_file_name = None # primeira vez é vazio, então ja cria como None
 
     def get_term_id(self, term: str):
         return self.dic_index[term].term_id
@@ -174,28 +174,52 @@ class FileIndex(Index):
         # collector desabilitado
         gc.disable()
 
-        # ordena pelo term_id, doc_id
-        self.lst_occurrences_tmp.sort(key=lambda x: x.term_id)
+        # ordena pelo term_id
+        self.lst_occurrences_tmp.sort()
+        
+        # self.idx_file_counter
+        '''
+            idx_file_counter: No código, você irá criar sempre novos indices, excluindo o antigo. Este atributo será útil para definirmos o nome do arquivo do índice. O novo arquivo do índice chamará occur_index_X em que  𝑋  é o número do mesmo.
+        '''
+        # self.str_idx_file_name
+        '''
+            str_idx_file_name: Atributo que armazena o arquivo indice atual. A primeira vez que executarmos save_tmp_occurrences não haverá arquivo criado e, assim str_idx_file_name = None
+        '''
 
+        if self.str_idx_file_name == None:
+            # primeira vez acessando save_tmp_occurrences
+            # nao existe arquivo antigo
+            self.str_idx_file_name = f"occur_index_{self.idx_file_counter}.idx"
+            file = None # nao existe arquivo antigo 
+        else:
+            # ja ocorreu acesso ao save_tmp_occurrences
+            file = open(self.str_idx_file_name, "rb") # abrir o arquivo antigo
+            self.idx_file_counter = self.idx_file_counter + 1 # atualiza contagem pra abrir novo
+            self.str_idx_file_name = f"occur_index_{self.idx_file_counter}.idx" # novo nome
+            
         ### Abra um arquivo novo faça a ordenação externa: compar sempre a primeira posição
-        file = open('memoria_secundaria.bin', 'wb')
-        new_file = open('memoria_secundaria_new.bin', 'wb')
+        new_file = open(self.str_idx_file_name, 'wb')
 
         ### da lista com a primeira possição do arquivo usando os métodos next_from_list e next_from_file
-        nextTermFromFile = self.next_from_file(file)
-        nextTermFromList = self.next_from_list()
-        while nextTermFromFile is not None or nextTermFromList is not None:
-            if nextTermFromList < nextTermFromFile:
-                new_file.write(nextTermFromList)
-                nextTermFromList = self.next_from_list()
+        next_term_from_file = self.next_from_file(file)
+        next_term_from_list = self.next_from_list()
+        while next_term_from_file is not None or next_term_from_list is not None:
+            if next_term_from_list < next_term_from_file or next_term_from_file is None:
+                next_term_from_list.write(new_file)
+                next_term_from_list = self.next_from_list()
             else:
-                new_file.write(nextTermFromFile)
-                nextTermFromFile = self.next_from_file()
+                print(next_term_from_file)
+                next_term_from_file.write(new_file)
+                next_term_from_file = self.next_from_file(file)
             ### para armazenar no novo indice ordenado
 
         # limpar a lista e fechar o arquivo
         self.lst_occurrences_tmp = []
-        file.close()
+        try:
+            file.close()
+        except:
+            pass
+        new_file.close()
         gc.enable()
 
     def finish_indexing(self):
