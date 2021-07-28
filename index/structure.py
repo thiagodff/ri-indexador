@@ -74,10 +74,9 @@ class TermOccurrence:
         self.term_freq = term_freq
 
     def write(self, idx_file):
-        file = open(idx_file, "wb")
-        file.write(self.doc_id.to_bytes(4, byteorder="big"))
-        file.write(self.term_id.to_bytes(4, byteorder="big"))
-        file.write(self.term_freq.to_bytes(4, byteorder="big"))
+        idx_file.write(self.doc_id.to_bytes(4, byteorder="big"))
+        idx_file.write(self.term_id.to_bytes(4, byteorder="big"))
+        idx_file.write(self.term_freq.to_bytes(4, byteorder="big"))
         pass
 
     def __hash__(self):
