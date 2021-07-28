@@ -74,6 +74,10 @@ class TermOccurrence:
         self.term_freq = term_freq
 
     def write(self, idx_file):
+        file = open(idx_file, "wb")
+        file.write(self.doc_id.to_bytes(4, byteorder="big"))
+        file.write(self.term_id.to_bytes(4, byteorder="big"))
+        file.write(self.term_freq.to_bytes(4, byteorder="big"))
         pass
 
     def __hash__(self):
@@ -120,7 +124,7 @@ class HashIndex(Index):
 
 
 class TermFilePosition:
-    def __init__(self,term_id:int,  term_file_start_pos:int=None, doc_count_with_term:int = None):
+    def __init__(self,term_id:int, term_file_start_pos:int=None, doc_count_with_term:int = None):
         self.term_id = term_id
 
         #a serem definidos após a indexação
@@ -129,6 +133,7 @@ class TermFilePosition:
 
     def __str__(self):
         return f"term_id: {self.term_id}, doc_count_with_term: {self.doc_count_with_term}, term_file_start_pos: {self.term_file_start_pos}"
+    
     def __repr__(self):
         return str(self)
 
@@ -169,7 +174,6 @@ class FileIndex(Index):
 
 
     def save_tmp_occurrences(self):
-
         #ordena pelo term_id, doc_id
         #Para eficiencia, todo o codigo deve ser feito com o garbage
         #collector desabilitado
