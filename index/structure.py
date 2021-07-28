@@ -160,14 +160,22 @@ class FileIndex(Index):
             self.save_tmp_occurrences()
 
     def next_from_list(self) -> TermOccurrence:
-        return None
+        if len(self.lst_occurrences_tmp) == 0:
+            return None
+        return self.lst_occurrences_tmp.pop(0)
 
     def next_from_file(self,file_idx) -> TermOccurrence:
             #next_from_file = pickle.load(file_idx)
         bytes_doc_id = file_idx.read(4)
         if not bytes_doc_id:
             return None
-        #seu código aqui :)
+        
+        bytes_term_id = file_idx.read(4)
+        bytes_term_freq = file_idx.read(4)
+
+        doc_id = int.from_bytes(bytes_doc_id, "big")
+        term_id = int.from_bytes(bytes_term_id, "big")
+        term_freq = int.from_bytes(bytes_term_freq, "big")
 
         return TermOccurrence(doc_id, term_id, term_freq)
 
