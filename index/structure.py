@@ -228,14 +228,36 @@ class FileIndex(Index):
 
         # Sugestão: faça a navegação e obetenha um mapeamento
         # id_termo -> obj_termo armazene-o em dic_ids_por_termo
-        dic_ids_por_termo = {}
+        dic_ids_por_termo = {} # ids sao as chaves e as palavras sao os itens
         for str_term, obj_term in self.dic_index.items():
-            pass
+            dic_ids_por_termo[obj_term.term_id] = str_term
 
         with open(self.str_idx_file_name, 'rb') as idx_file:
-            # navega nas ocorrencias para atualizar cada termo em dic_ids_por_termo
-            # apropriadamente
-            pass
+            # Usar o next_from_file pra ir pegando cada registro
+            next_term_from_file = self.next_from_file(idx_file)
+            seek_file = 0
+            while next_term_from_file is not None:
+                # pegando chave do dic_index
+                str_term = dic_ids_por_termo[next_term_from_file.term_id]
+
+                # Quantidade de vezes que a palavra aparece
+                # lembrar que eles ja estao em ordem no arquivo
+                qtde = self.dic_index[str_term].doc_count_with_term
+                if qtde is None: 
+                    qtde = 0
+                # so ir somando 1
+                self.dic_index[str_term].doc_count_with_term = qtde + 1
+                # quando aparecer a ultima ocorrencia, vai chegar no valor correto
+
+                # Atualizando a posicao de inicio
+                # Tem que atualizar a pos so para a primeira ocorrencia daquela palavra
+                if self.dic_index[str_term].term_file_start_pos is None:
+                    self.dic_index[str_term].term_file_start_pos = seek_file
+                
+                # Chamar o proximo e andar com o sekker do arquivo
+                next_term_from_file = self.next_from_file(idx_file)
+                # Cada registro tem tamanho 94
+                seek_file = seek_file + 94         
 
     def get_occurrence_list(self, term: str) -> List:
         return []
