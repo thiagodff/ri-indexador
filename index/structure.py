@@ -276,6 +276,7 @@ class FileIndex(Index):
             # consumir a primeira ocorrencia
             next = self.next_from_file(idx_file)
             # enquanto o next tiver o mesmo term_id do passado na busca vai add
+            print(f'{next.term_id}'+'=='+'{term_id}')
             while (next.term_id == term_id):
                 occurrence_list.append(next)
                 # ja ta em ordem, so chamar a proxima ocorrencia
