@@ -28,7 +28,7 @@ class Cleaner:
 
     def read_stop_words(self, str_file):
         set_stop_words = set()
-        with open(str_file, "r") as stop_words_file:
+        with open(str_file, encoding='utf-8') as stop_words_file:
             for line in stop_words_file:
                 arr_words = line.split(",")
                 [set_stop_words.add(word) for word in arr_words]
