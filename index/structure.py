@@ -226,7 +226,7 @@ class FileIndex(Index):
         if len(self.lst_occurrences_tmp) > 0:
             self.save_tmp_occurrences()
 
-        # Sugestão: faça a navegação e obetenha um mapeamento
+        # Sugestão: faça a navegação e obtenha um mapeamento
         # id_termo -> obj_termo armazene-o em dic_ids_por_termo
         dic_ids_por_termo = {} # ids sao as chaves e as palavras sao os itens
         for str_term, obj_term in self.dic_index.items():
@@ -254,7 +254,7 @@ class FileIndex(Index):
                 if self.dic_index[str_term].term_file_start_pos is None:
                     self.dic_index[str_term].term_file_start_pos = seek_file
                 
-                # Chamar o proximo e andar com o sekker do arquivo
+                # Chamar o proximo e andar com o seeker do arquivo
                 next_term_from_file = self.next_from_file(idx_file)
                 # Cada registro tem tamanho 94
                 seek_file = seek_file + 94         
@@ -266,7 +266,7 @@ class FileIndex(Index):
         else:
             # entao o termo existe e ele tem um id
             term_id = self.dic_index[term].term_id
-            # pode occorrer mais de uma vez, por isso eh uma lista
+            # pode ocorrer mais de uma vez, por isso eh uma lista
             occurrence_list = []
 
             # abrir o arquivo e ir para a posicao de inicio do termo
