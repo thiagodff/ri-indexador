@@ -260,14 +260,13 @@ class FileIndex(Index):
                 seek_file = seek_file + 94         
 
     def get_occurrence_list(self, term: str) -> List:
+        occurrence_list = []
         # existe no dicionario?
-        if term is not self.dic_index:
-            return [] # se nao ta no dicionario, o termo nao ocorre no arquivo
-        else:
+        if term in self.dic_index.keys():
             # entao o termo existe e ele tem um id
             term_id = self.dic_index[term].term_id
-            # pode ocorrer mais de uma vez, por isso eh uma lista
-            occurrence_list = []
+
+            # pode occorrer mais de uma vez, por isso eh uma lista
 
             # abrir o arquivo e ir para a posicao de inicio do termo
             idx_file = open(self.str_idx_file_name, 'rb')
@@ -276,14 +275,15 @@ class FileIndex(Index):
             # consumir a primeira ocorrencia
             next = self.next_from_file(idx_file)
             # enquanto o next tiver o mesmo term_id do passado na busca vai add
-            print(f'{next.term_id}'+'=='+'{term_id}')
-            while (next.term_id == term_id):
+            while (next != None and next.term_id == term_id):
                 occurrence_list.append(next)
                 # ja ta em ordem, so chamar a proxima ocorrencia
                 next = self.next_from_file(idx_file)
 
             # ja add todos
-            idx_file.close()
+            idx_file.close()         
+        else:
+            pass # se nao ta no dicionario, o termo nao ocorre no arquivo
         return occurrence_list
 
     def document_count_with_term(self, term: str) -> int:
