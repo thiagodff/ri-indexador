@@ -46,10 +46,7 @@ class Cleaner:
     @staticmethod
     def is_accent(term):
         accents = "áéíóúâêôçãẽõü"
-        for accent in accents:
-            if accent in term:
-                return True
-        return False
+        return term in accents
 
     def preprocess_word(self, term: str) -> str or None:
         if self.is_stop_word(term) or self.is_accent(term):
@@ -59,8 +56,14 @@ class Cleaner:
             term = self.remove_accents(term)
         if self.perform_stemming:
             term = self.word_stem(term)
-        return term
+        return self.remove_dots(term)
 
+    @staticmethod
+    def remove_dots(word):
+        invalid_dots = (';', '!', '?', ':', ',', '.')
+        for dot in invalid_dots:
+            word = word.replace(dot, '')
+        return word
 
 
 class HTMLIndexer:
@@ -75,7 +78,15 @@ class HTMLIndexer:
 
     def text_word_count(self, plain_text: str):
         dic_word_count = {}
-
+        token_list = word_tokenize(plain_text)
+        for word in token_list:
+            processed_word = self.cleaner.preprocess_word(word)
+            if processed_word in dic_word_count.keys():
+                dic_word_count[processed_word] += 1
+            else:
+                dic_word_count[processed_word] = 1
+        del dic_word_count['']
+        del dic_word_count[None]
         return dic_word_count
 
     def index_text(self, doc_id: int, text_html: str):
