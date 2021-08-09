@@ -85,12 +85,18 @@ class HTMLIndexer:
                 dic_word_count[processed_word] += 1
             else:
                 dic_word_count[processed_word] = 1
-        del dic_word_count['']
-        del dic_word_count[None]
+        try:
+            del dic_word_count['']
+            del dic_word_count[None]
+        except KeyError:
+            pass
         return dic_word_count
 
     def index_text(self, doc_id: int, text_html: str):
-        pass
+        text_plain = self.cleaner.html_to_plain_text(text_html)
+        dict_text_word_count = self.text_word_count(text_plain)
+        for key in dict_text_word_count:
+            self.index.index(key, doc_id, dict_text_word_count[key])
 
     def index_text_dir(self, path: str):
         for str_sub_dir in os.listdir(path):
