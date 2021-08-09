@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from nltk.stem.snowball import SnowballStemmer
 from bs4 import BeautifulSoup
 import string
@@ -24,7 +26,8 @@ class Cleaner:
         self.perform_stemming = perform_stemming
 
     def html_to_plain_text(self, html_doc: str) -> str:
-        return BeautifulSoup(html_doc, parser='lxml').get_text()
+        soup = BeautifulSoup(html_doc, parser='lxml')
+        return soup.get_text()
 
     def read_stop_words(self, str_file):
         set_stop_words = set()
@@ -96,8 +99,37 @@ class HTMLIndexer:
         text_plain = self.cleaner.html_to_plain_text(text_html)
         dict_text_word_count = self.text_word_count(text_plain)
         for key in dict_text_word_count:
-            self.index.index(key, doc_id, dict_text_word_count[key])
+            if key:
+                self.index.index(key, doc_id, dict_text_word_count[key])
 
     def index_text_dir(self, path: str):
         for str_sub_dir in os.listdir(path):
-            path_sub_dir = f"{path}/{str_sub_dir}"
+            path_sub_dir = self.create_path(path, str_sub_dir)
+            self.browse_in_directory(path_sub_dir)
+
+    def browse_in_directory(self, path_sub_dir):
+        for file_name in os.listdir(path_sub_dir):
+            filename = self.create_path(path_sub_dir, file_name)
+            self.index_file(file_name, filename)
+            self.write_file(file_name)
+
+    @staticmethod
+    def create_path(path, str_sub_dir):
+        return f'{path}/{str_sub_dir}'
+
+    @staticmethod
+    def write_file(file_name):
+        with open("teste.txt", "a", encoding="utf-8") as file:
+            file.write(file_name)
+
+    def index_file(self, file_name, filename):
+        with open(filename, "rb") as file:
+            self.index_text(self.get_doc_id(file_name), file)
+
+    def get_doc_id(self, file_name):
+        return int(self.get_first(file_name))
+
+    @staticmethod
+    def get_first(file_name):
+        return (file_name.split("."))[0]
+
